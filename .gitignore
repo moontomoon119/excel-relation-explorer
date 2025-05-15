@@ -51,3 +51,4 @@ openroute/ors-docker/graphs/
 *.osm.pbf
 *.dump
 *.backup
+db/init.sql
