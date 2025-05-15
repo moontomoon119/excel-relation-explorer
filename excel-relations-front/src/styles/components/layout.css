@@ -1,0 +1,99 @@
+/**
+ * 레이아웃 스타일
+ */
+
+/* 기본 레이아웃 구조 */
+.main-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.left-sidebar {
+  width: var(--sidebar-width);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  background-color: var(--background-light);
+  transition: width 0.3s ease;
+}
+
+.right-sidebar {
+  width: var(--sidebar-width);
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+  background-color: var(--background-light);
+  transition: width 0.3s ease;
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background-color: #fff;
+}
+
+/* 반응형 레이아웃 */
+@media (max-width: 992px) {
+  .main-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .left-sidebar,
+  .right-sidebar {
+    width: 100%;
+    max-height: 50vh;
+    border-right: none;
+    border-left: none;
+  }
+  
+  .left-sidebar {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .right-sidebar {
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .main-content {
+    height: 50vh;
+  }
+}
+
+/* 사이드바 접기/펼치기 */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 50px;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  border-radius: 0 4px 4px 0;
+}
+
+.left-toggle {
+  right: -20px;
+  border-left: none;
+}
+
+.right-toggle {
+  left: -20px;
+  border-right: none;
+}
+
+.sidebar-collapsed {
+  width: 0;
+  overflow: hidden;
+  border: none;
+}
+
+/* 접힌 사이드바의 토글 버튼 */
+.sidebar-collapsed .sidebar-toggle {
+  right: -20px;
+} 

@@ -1,0 +1,364 @@
+/**
+ * 맵 컴포넌트 스타일
+ */
+
+.map-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.map-title-area {
+  display: flex;
+  align-items: center;
+}
+
+.map-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.map-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.map-provider-selector {
+  margin-left: 15px;
+  position: relative;
+}
+
+.map-provider-selector .current-provider {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.map-provider-selector .current-provider:hover {
+  background-color: #e5e5e5;
+}
+
+.map-provider-selector .current-provider i {
+  font-size: 0.7rem;
+}
+
+.map-provider-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  margin-top: 5px;
+  max-width: 250px;
+  display: none;
+}
+
+.map-provider-dropdown.show {
+  display: block;
+}
+
+.map-provider-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.map-provider-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.map-provider-item:last-child {
+  border-bottom: none;
+}
+
+.map-provider-item:hover {
+  background-color: #f5f5f5;
+}
+
+.map-provider-item.active {
+  background-color: #e6f7ff;
+  font-weight: 500;
+}
+
+.map-provider-item .provider-name {
+  font-weight: 500;
+  display: block;
+  font-size: 0.8rem;
+}
+
+.map-provider-item .provider-description {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 3px;
+}
+
+.map-view {
+  flex: 1;
+  position: relative;
+  background-color: #f5f5f5;
+  overflow: hidden;
+}
+
+.map-view-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* 맵 플레이스홀더 (맵 라이브러리 로드 전) */
+.map-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #f5f5f5;
+  z-index: 1;
+}
+
+.placeholder-content {
+  max-width: 400px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 0.85rem;
+}
+
+.placeholder-content.error {
+  border-left: 4px solid #dc3545;
+}
+
+.placeholder-content.error i {
+  color: #dc3545;
+  margin-right: 5px;
+}
+
+.pnu-sample {
+  text-align: left;
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 0.8rem;
+}
+
+.pnu-sample ul {
+  margin: 5px 0 0 0;
+  padding-left: 20px;
+}
+
+.pnu-sample li {
+  font-family: monospace;
+  margin-bottom: 3px;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 15px auto;
+  border-radius: 50%;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Leaflet 지도 커스텀 스타일 */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
+/* OpenLayers 지도 커스텀 스타일 */
+.ol-control {
+  background-color: transparent;
+  padding: 0;
+}
+
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 220px;
+}
+
+.ol-popup:after, .ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+
+.ol-popup:before {
+  border-top-color: #ccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+
+/* PNU 팝업 스타일 */
+.pnu-popup {
+  min-width: 200px;
+  max-width: 300px;
+  padding: 5px;
+}
+
+.pnu-popup h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.pnu-popup p {
+  margin: 5px 0;
+  font-size: 0.8rem;
+}
+
+/* MapContainer.js에서 이동된 스타일 */
+.map-header-left h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.map-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 컨트롤 간의 간격 */
+}
+
+/* 프로바이더 선택기 스타일 */
+.map-provider-selector {
+  position: relative;
+  display: inline-block;
+}
+
+#currentProvider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 85px;
+  white-space: nowrap;
+  height: 31px;
+}
+
+.provider-name {
+  margin-right: 5px;
+  white-space: nowrap;
+}
+
+.map-provider-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  margin-top: 5px;
+  min-width: max-content;
+  width: auto;
+  padding: 0;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+.map-provider-dropdown.show {
+  display: block;
+}
+
+.map-provider-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.map-provider-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-family: inherit;
+}
+
+.provider-description {
+  display: none; /* 설명 텍스트 숨김 */
+}
+
+.map-provider-item:hover {
+  background-color: #f0f0f0;
+}
+
+.map-provider-item.active {
+  background-color: #e6e6e6;
+  font-weight: bold;
+}
+
+/* 지도 스타일 컨트롤 플레이스홀더 스타일 */
+.map-style-control-placeholder {
+  display: inline-block;
+}
+
+.map-style-control-placeholder button.btn {
+  height: 31px;
+} 

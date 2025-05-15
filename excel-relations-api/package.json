@@ -1,0 +1,41 @@
+{
+  "name": "excel-relations-api",
+  "version": "1.0.0",
+  "description": "Excel Relations API - PNU 아이소크론맵 및 그리드 분석 API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "pnu-filter": "node src/cli/pnuFilterCli.js",
+    "text-filter": "node src/cli/textFilterCli.js",
+    "date-filter": "node src/cli/dateFilterCli.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "chokidar": "^4.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "iconv-lite": "^0.6.3",
+    "jschardet": "^3.1.4",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.2",
+    "papaparse": "^5.5.2",
+    "pg": "^8.14.1",
+    "uuid": "^11.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

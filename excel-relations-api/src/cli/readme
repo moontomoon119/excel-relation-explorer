@@ -1,0 +1,13 @@
+node src/cli/pnuFilterCli.js
+
+pnu-filter> ls
+# 모든 숫자형 컬럼 확인
+
+pnu-filter> filter src_lxmap_demo_2 ai_price 1000 2000
+# 지정 범위 내 PNU 필터링
+
+pnu-filter> percent src_lxmap_demo_2 hubdist 500 10
+# 500을 중심으로 ±10% 범위 내 PNU 필터링
+
+
+ node testgridsum2.js

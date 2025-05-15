@@ -1,0 +1,254 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Container, Box, Typography, TextField, Button, FormControl,
+  InputLabel, Select, MenuItem, Checkbox, ListItemText, OutlinedInput,
+  Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+} from '@mui/material';
+
+const API_BASE_URL = 'http://localhost:3000/api';
+
+const TextFilterComponent = () => {
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
+  const [columns, setColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [values, setValues] = useState([]);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState(null);
+  const [error, setError] = useState('');
+
+  // 1. 테이블 목록 로드
+  useEffect(() => {
+    const fetchTables = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/columns/text`);
+        const data = response.data.data;
+        
+        // 테이블 이름 중복 제거
+        const uniqueTables = [...new Set(data.map(col => col.table_name))];
+        setTables(uniqueTables);
+      } catch (err) {
+        setError('테이블 목록을 불러오는데 실패했습니다.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTables();
+  }, []);
+
+  // 2. 테이블 선택 시 컬럼 목록 로드
+  const handleTableChange = async (event) => {
+    const tableName = event.target.value;
+    setSelectedTable(tableName);
+    setSelectedColumn('');
+    setValues([]);
+    setSelectedValues([]);
+    setResults(null);
+    
+    if (!tableName) return;
+    
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/columns/text/${tableName}`);
+      setColumns(response.data.data);
+    } catch (err) {
+      setError('컬럼 목록을 불러오는데 실패했습니다.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 3. 컬럼 선택 시 고유값 목록 로드
+  const handleColumnChange = async (event) => {
+    const columnName = event.target.value;
+    setSelectedColumn(columnName);
+    setValues([]);
+    setSelectedValues([]);
+    setResults(null);
+    
+    if (!columnName) return;
+    
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/columns/text/${selectedTable}/${columnName}/values`);
+      setValues(response.data.data.value_stats);
+    } catch (err) {
+      setError('컬럼 값을 불러오는데 실패했습니다.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4. 값 선택 처리
+  const handleValueChange = (event) => {
+    const selectedItems = event.target.value;
+    setSelectedValues(selectedItems);
+  };
+
+  // 5. 필터 적용
+  const applyFilter = async () => {
+    if (selectedValues.length === 0) {
+      setError('하나 이상의 값을 선택해주세요.');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await axios.post(
+        `${API_BASE_URL}/filter/text/${selectedTable}/${selectedColumn}`,
+        { selectedValues: selectedValues.map(item => item.value) }
+      );
+      
+      setResults(response.data.data);
+    } catch (err) {
+      setError('필터링 중 오류가 발생했습니다.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container maxWidth="md">
+      <Box my={4}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          글자형 컬럼 필터
+        </Typography>
+        
+        {error && (
+          <Box my={2}>
+            <Typography color="error">{error}</Typography>
+          </Box>
+        )}
+        
+        {/* 1. 테이블 선택 */}
+        <Box my={2}>
+          <FormControl fullWidth>
+            <InputLabel>테이블 선택</InputLabel>
+            <Select
+              value={selectedTable}
+              onChange={handleTableChange}
+              label="테이블 선택"
+              disabled={loading}
+            >
+              {tables.map(table => (
+                <MenuItem key={table} value={table}>
+                  {table}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        
+        {/* 2. 컬럼 선택 */}
+        {selectedTable && (
+          <Box my={2}>
+            <FormControl fullWidth>
+              <InputLabel>컬럼 선택</InputLabel>
+              <Select
+                value={selectedColumn}
+                onChange={handleColumnChange}
+                label="컬럼 선택"
+                disabled={loading}
+              >
+                {columns.map(col => (
+                  <MenuItem key={col.column_name} value={col.column_name}>
+                    {col.column_name} ({col.data_type})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )}
+        
+        {/* 3. 값 선택 */}
+        {values.length > 0 && (
+          <Box my={2}>
+            <FormControl fullWidth>
+              <InputLabel>값 선택</InputLabel>
+              <Select
+                multiple
+                value={selectedValues}
+                onChange={handleValueChange}
+                input={<OutlinedInput label="값 선택" />}
+                renderValue={(selected) => selected.map(item => item.value).join(', ')}
+                disabled={loading}
+              >
+                {values.map((item) => (
+                  <MenuItem key={item.value} value={item}>
+                    <Checkbox checked={selectedValues.some(val => val.value === item.value)} />
+                    <ListItemText 
+                      primary={item.value} 
+                      secondary={`(${item.frequency}개)`} 
+                    />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )}
+        
+        {/* 4. 필터 버튼 */}
+        {selectedValues.length > 0 && (
+          <Box my={2}>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={applyFilter}
+              disabled={loading}
+              fullWidth
+            >
+              {loading ? '필터링 중...' : '필터 적용'}
+            </Button>
+          </Box>
+        )}
+        
+        {/* 5. 결과 표시 */}
+        {results && (
+          <Box my={4}>
+            <Typography variant="h6" gutterBottom>
+              필터링 결과 ({results.pnu_count}개)
+            </Typography>
+            
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>번호</TableCell>
+                    <TableCell>PNU</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {results.pnu_list.slice(0, 100).map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{row.pnu}</TableCell>
+                    </TableRow>
+                  ))}
+                  {results.pnu_count > 100 && (
+                    <TableRow>
+                      <TableCell colSpan={2} align="center">
+                        ... 외 {results.pnu_count - 100}개
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+      </Box>
+    </Container>
+  );
+};
+
+export default TextFilterComponent;

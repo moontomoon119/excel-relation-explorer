@@ -1,0 +1,30 @@
+{
+  "name": "excel-relations-front",
+  "version": "1.0.0",
+  "description": "Excel Relations Frontend",
+  "main": "server.js",
+  "scripts": {
+  "start": "node server.js",
+  "build": "webpack --mode production",
+  "dev:webpack": "webpack --mode development --watch",
+  "dev:server": "nodemon server.js",
+  "dev": "concurrently \"npm run dev:webpack\" \"npm run dev:server\""
+},
+  "dependencies": {
+    "express": "^4.18.2",
+    "leaflet": "^1.9.4",
+    "ol": "^6.9.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.22.5",
+    "babel-loader": "^9.1.2",
+    "concurrently": "^9.1.2",
+    "css-loader": "^7.1.2",
+    "nodemon": "^2.0.22",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
