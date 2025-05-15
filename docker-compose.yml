@@ -43,12 +43,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db:/tmp/sql
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=excel_relations
-    restart: unless-stopped
+    entrypoint: >
+      sh -c "
+      cat /tmp/sql/init_part_* > /docker-entrypoint-initdb.d/init.sql 2>/dev/null || true;
+      exec docker-entrypoint.sh postgres"
 
   # OpenRouteService
   openroute:

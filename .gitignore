@@ -48,8 +48,6 @@ postgres_data_prod/
 # Large files - exclude from Git
 openroute/ors-docker/files/
 openroute/ors-docker/graphs/
-db/init.sql
-db/*.sql
 *.osm.pbf
 *.dump
 *.backup
