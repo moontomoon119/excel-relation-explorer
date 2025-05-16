@@ -1,4 +1,8 @@
-# Excel Relation Explorer 실행 가이드
+# Excel Relation Explorer 실행 가이드 (문의 moontomoon119@gmail.com)
+
+필요한 환경(필요시 다운받아야 합니다):
+Git (git clone 명령어 사용)
+Docker (docker-compose 사용)
 
 ## 처음 설치 방법 (처음실행시 다운 및 설치되는 시간이 10분 내외로 걸립니다.)
 1. `Win + R` → `cmd` 입력
