@@ -6,7 +6,7 @@ const isochroneUtils = require('../utils/isochroneUtils');
  * OpenRoute API를 호출하여 아이소크론 맵 폴리곤을 가져옵니다.
  */
 async function callOpenRouteAPI(x, y, rangeMinutes) {
-  const url = process.env.OPENROUTE_API_URL || 'http://localhost:8081/ors/v2/isochrones/foot-walking';
+const url = process.env.OPENROUTE_API_URL || 'http://excel-relations-ors-app:8082/ors/v2/isochrones/foot-walking';
   
   const body = {
     locations: [[parseFloat(x), parseFloat(y)]],

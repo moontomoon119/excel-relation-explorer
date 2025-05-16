@@ -1,4 +1,86 @@
+version: '3.8'
+
 services:
+  # OSM 파일 다운로드 서비스
+  ors-download:
+    image: alpine:latest
+    container_name: excel-relations-ors-download
+    volumes:
+      - ./openroute/ors-docker:/ors
+    command: >
+      sh -c "
+        echo '=== OpenRouteService OSM Download Service ===';
+        
+        echo 'Creating directories...';
+        mkdir -p /ors/files /ors/graphs /ors/elevation_cache /ors/logs /ors/config;
+        
+        OSM_FILE='/ors/files/south-korea-latest.osm.pbf';
+        if [ ! -f $$OSM_FILE ] || [ ! -s $$OSM_FILE ]; then
+          echo 'OSM file not found or empty. Starting download...';
+          
+          apk add --no-cache wget curl;
+          
+          echo 'Downloading from: http://download.geofabrik.de/asia/south-korea-latest.osm.pbf';
+          if wget --timeout=300 --tries=3 --progress=bar:force:noscroll -O $$OSM_FILE.tmp http://download.geofabrik.de/asia/south-korea-latest.osm.pbf; then
+            mv $$OSM_FILE.tmp $$OSM_FILE;
+            echo 'Download completed successfully';
+            echo \"File size: $$(ls -lh $$OSM_FILE | awk '{print $$5}')\";
+          else
+            echo 'ERROR: Download failed!';
+            echo 'Please manually download south-korea-latest.osm.pbf from:';
+            echo 'https://download.geofabrik.de/asia/south-korea.html';
+            echo 'and place it in ./openroute/ors-docker/files/';
+            exit 1;
+          fi
+        else
+          echo 'OSM file already exists';
+          echo \"File: $$OSM_FILE\";
+          echo \"Size: $$(ls -lh $$OSM_FILE | awk '{print $$5}')\";
+        fi;
+        
+        echo 'Setting permissions...';
+        chmod -R 755 /ors;
+        chown -R 1000:1000 /ors 2>/dev/null || echo 'Warning: Could not change ownership (not critical)';
+        
+        echo 'Setup completed successfully!';
+      "
+    restart: "no"
+
+  # OpenRouteService 메인 애플리케이션
+  ors-app:
+    image: openrouteservice/openrouteservice:v8.2.0
+    container_name: excel-relations-ors-app
+    ports:
+      - "8082:8082"  # API 포트
+      - "9002:9001"  # 액추에이터 포트 (모니터링)
+    volumes:
+      - ./openroute/ors-docker:/home/ors
+    environment:
+      REBUILD_GRAPHS: False
+      CONTAINER_LOG_LEVEL: INFO
+      
+      
+      # 메모리 설정
+      XMS: 8g
+      XMX: 16g
+      CATALINA_OPTS: "-Dserver.port=8082 -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+      
+      ORS_CONFIG_LOCATION: /home/ors/config/ors-config.yml
+    
+    depends_on:
+      ors-download:
+        condition: service_completed_successfully
+    
+    restart: unless-stopped
+    
+    # 헬스체크
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/ors/v2/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
   # 프론트엔드 서비스
   frontend:
     build: ./excel-relations-front
@@ -27,6 +109,7 @@ services:
       - ./excel-relations-api/uploads:/app/uploads
     depends_on:
       - postgres
+      - ors-app  # OpenRouteService에 의존
     environment:
       - NODE_ENV=production
       - PORT=5000
@@ -36,6 +119,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=excel_relations
+      # ORS 연결을 위한 환경변수
+      - OPENROUTE_API_URL=http://excel-relations-ors-app:8082/ors/v2/isochrones/foot-walking
     restart: unless-stopped
 
   # PostgreSQL 데이터베이스
@@ -56,95 +141,6 @@ services:
       cat /tmp/sql/init_part_* > /docker-entrypoint-initdb.d/init.sql 2>/dev/null || true;
       exec docker-entrypoint.sh postgres"
     restart: unless-stopped
-
-  # OpenRouteService - isochrone 특별 설정 추가
-  openroute:
-    image: openrouteservice/openrouteservice:v8.2.0
-    container_name: excel-relations-openroute
-    ports:
-      - "8081:8082"
-      - "9002:9001"
-    volumes:
-      - ./openroute/ors-docker:/home/ors
-    environment:
-      # 메모리 증가 - isochrone 계산을 위해
-      - REBUILD_GRAPHS=True
-      - CONTAINER_LOG_LEVEL=INFO
-      - XMS=6g
-      - XMX=12g
-      
-      # 기본 엔진 설정
-      - ors.engine.source_file=/home/ors/files/south-korea-latest.osm.pbf
-      - ors.engine.graphs_root_path=/home/ors/graphs
-      - ors.engine.elevation.cache_path=/home/ors/elevation_cache
-      - ors.engine.init_threads=2
-      
-      # 프로필 설정
-      - ors.engine.profiles.active=driving-car
-      - ors.engine.profiles.default_params.encoder_flags_size=4
-      - ors.engine.profiles.default_params.graphs_root_path=/home/ors/graphs
-      - ors.engine.profiles.default_params.elevation=true
-      - ors.engine.profiles.default_params.preparation.min_network_size=200
-      
-      # Driving car 프로필
-      - ors.engine.profiles.driving-car.enabled=true
-      - ors.engine.profiles.driving-car.profiles=driving
-      - ors.engine.profiles.driving-car.parameters.encoder_flags_size=8
-      - ors.engine.profiles.driving-car.parameters.encoder_options.turn_costs=true
-      - ors.engine.profiles.driving-car.preparation.min_network_size=200
-      
-      # FastIsochrone 활성화 (더 빠른 isochrone 계산)
-      - ors.engine.profiles.driving-car.preparation.methods.fastisochrones.enabled=true
-      - ors.engine.profiles.driving-car.preparation.methods.fastisochrones.threads=4
-      
-      # 서비스 설정 - 제한 완화
-      - ors.services.routing.enabled=true
-      - ors.services.isochrones.enabled=true
-      - ors.services.isochrones.maximum_locations=5
-      - ors.services.isochrones.maximum_intervals=5
-      - ors.services.isochrones.maximum_range_distance_default=100000
-      - ors.services.isochrones.maximum_range_time_default=3600
-      - ors.services.matrix.enabled=true
-      
-      # 로깅
-      - logging.level.root=INFO
-      - logging.level.org.heigit.ors=INFO
-      - logging.level.org.heigit.ors.isochrones=DEBUG
-    depends_on:
-      ors-download:
-        condition: service_completed_successfully
-    restart: unless-stopped
-
-  # OSM 파일 다운로드
-  ors-download:
-    image: alpine:latest
-    container_name: ors-download
-    volumes:
-      - ./openroute:/openroute
-    command: |
-      sh -c "
-        echo 'Creating directories...'
-        mkdir -p /openroute/ors-docker/files /openroute/ors-docker/graphs /openroute/ors-docker/elevation_cache /openroute/ors-docker/logs /openroute/ors-docker/config
-        
-        # OSM 파일 다운로드
-        if [ ! -f /openroute/ors-docker/files/south-korea-latest.osm.pbf ] || [ ! -s /openroute/ors-docker/files/south-korea-latest.osm.pbf ]; then
-          echo 'Downloading OSM file for South Korea...'
-          apk add --no-cache wget
-          wget --progress=bar:force:noscroll -O /openroute/ors-docker/files/south-korea-latest.osm.pbf.tmp \
-            http://download.geofabrik.de/asia/south-korea-latest.osm.pbf
-          mv /openroute/ors-docker/files/south-korea-latest.osm.pbf.tmp /openroute/ors-docker/files/south-korea-latest.osm.pbf
-          echo 'Download completed'
-          ls -lh /openroute/ors-docker/files/south-korea-latest.osm.pbf
-        else
-          echo 'OSM file already exists'
-          ls -lh /openroute/ors-docker/files/south-korea-latest.osm.pbf
-        fi
-        
-        echo 'Setting permissions...'
-        chmod -R 755 /openroute/ors-docker
-        echo 'Setup completed'
-      "
-    restart: "no"
 
 volumes:
   postgres_data:
