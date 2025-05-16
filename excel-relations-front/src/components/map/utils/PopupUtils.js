@@ -11,7 +11,7 @@ import { API_CONFIG } from '../../../core/config.js';
  */
 const API_KEYS = {
   // Google Maps API 키 (정적 지도, 위성 이미지 등에 필요)
-  GOOGLE_MAPS: 'AIzaSyAriZRiDztzGO_WMbFAlwn4kYuUvpZgyd8'
+  GOOGLE_MAPS: '삭제된 api 키'
 };
 
 // 활성화된 팝업을 추적하기 위한 객체
