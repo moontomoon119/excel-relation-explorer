@@ -102,7 +102,8 @@ ors:
 #      maximum_locations: 5000
 #  ##### ORS engine settings #####
   engine:
-     source_file: /home/ors/files/south-korea-latest.osm.pbf
+    source_file: /home/ors/files/south-korea-latest.osm.pbf  # 이 부분을 변경
+
 #    init_threads: 1
 #    preparation_mode: false
 #    graphs_root_path: ./graphs
@@ -146,45 +147,45 @@ ors:
 #        methods:
 #          lm:
 #            active_landmarks: 8
-     profiles:
+    profiles:
 #      # All properties defined in ors.engine.profile_default can also be set in each profile to overwrite the defaults profile-specific.
       car:
-#        profile: driving-car
-#        encoder_options:
-#          turn_costs: true
-#          block_fords: false
-#          use_acceleration: true
-#        preparation:
-#          min_network_size: 200
-#          methods:
-#            ch:
-#              enabled: true
-#              threads: 1
-#              weightings: fastest
-#            lm:
-#              enabled: false
-#              threads: 1
-#              weightings: fastest,shortest
-#              landmarks: 16
-#            core:
-#              enabled: true
-#              threads: 1
-#              weightings: fastest,shortest
-#              landmarks: 64
-#              lmsets: highways;allow_all
-#        execution:
-#          methods:
-#            lm:
-#              active_landmarks: 6
-#            core:
-#              active_landmarks: 6
-#        ext_storages:
-#          WayCategory:
-#          HeavyVehicle:
-#          WaySurfaceType:
-#          Tollways:
-#          RoadAccessRestrictions:
-#            use_for_warnings: true
+        profile: driving-car
+        # encoder_options:
+        #   turn_costs: true
+        #   block_fords: false
+        #   use_acceleration: true
+        # preparation:
+        #   min_network_size: 200
+        #   methods:
+        #     ch:
+        #       enabled: true
+        #       threads: 1
+        #       weightings: fastest
+        #     lm:
+        #       enabled: false
+        #       threads: 1
+        #       weightings: fastest,shortest
+        #       landmarks: 16
+        #     core:
+        #       enabled: true
+        #       threads: 1
+        #       weightings: fastest,shortest
+        #       landmarks: 64
+        #       lmsets: highways;allow_all
+        # execution:
+        #   methods:
+        #     lm:
+        #       active_landmarks: 6
+        #     core:
+        #       active_landmarks: 6
+        # ext_storages:
+        #   WayCategory:
+        #   HeavyVehicle:
+        #   WaySurfaceType:
+        #   Tollways:
+        #   RoadAccessRestrictions:
+        #     use_for_warnings: true
         enabled: true
 #      hgv:
 #        profile: driving-hgv
@@ -216,17 +217,21 @@ ors:
 #          WaySurfaceType:
 #          Tollways:
       bike-regular:
-        profile: cycling-regular
-        encoder_options:
-          consider_elevation: true
-          turn_costs: true
-          block_fords: false
-        ext_storages:
-          WayCategory:
-          WaySurfaceType:
-          HillIndex:
-          TrailDifficulty:
-        enabled: true
+       profile: cycling-regular
+       enabled: true  # 이 줄을 추가
+      #    block_fords: false
+      #  ext_storages:
+      #    WayCategory:
+      #    WaySurfaceType:
+      #    HillIndex:
+      #    TrailDifficulty:
+      # preparation:
+      #     min_network_size: 200
+      #     methods:
+      #       ch:
+      #         enabled: true
+      #         threads: 1
+      #         weightings: fastest
 #      bike-mountain:
 #        profile: cycling-mountain
 #        encoder_options:
@@ -261,15 +266,20 @@ ors:
 #          HillIndex:
 #          TrailDifficulty:
       walking:
-        profile: foot-walking
-        encoder_options:
-          block_fords: false
-        ext_storages:
-          WayCategory:
-          WaySurfaceType:
-          HillIndex:
-          TrailDifficulty:
-        enabled: true
+       profile: foot-walking
+       enabled: true  # 이 줄을 추가
+      #  ext_storages:
+      #    WayCategory:
+      #    WaySurfaceType:
+      #    HillIndex:
+      #    TrailDifficulty:
+      # preparation:
+      #     min_network_size: 200
+      #     methods:
+      #       ch:
+      #         enabled: true
+      #         threads: 1
+      #         weightings: fastest
 #      hiking:
 #        profile: foot-hiking
 #        encoder_options:
@@ -290,10 +300,12 @@ ors:
 #          Wheelchair:
 #            KerbsOnCrossings: true
 #          OsmId:
-#      public-transport:
-#        profile: public-transport
-#        encoder_options:
-#          block_fords: false
-#        elevation: true
-#        maximum_visited_nodes: 1000000
-#        gtfs_file: ./src/test/files/vrn_gtfs_cut.zip
+      # public-transport:
+      #  profile: public-transport
+      #  encoder_options:
+      #    block_fords: false
+      #  elevation: true
+      #  maximum_visited_nodes: 1000000
+      #  gtfs_file: ./src/test/files/vrn_gtfs_cut.zip
+      # enabled: true  # 이 줄을 추가
+

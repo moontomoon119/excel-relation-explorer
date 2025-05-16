@@ -123,12 +123,13 @@ services:
       - OPENROUTE_API_URL=http://excel-relations-ors-app:8082/ors/v2/isochrones/foot-walking
     restart: unless-stopped
 
+  
   # PostgreSQL 데이터베이스
   postgres:
     image: postgis/postgis:15-3.3-alpine
     container_name: excel-relations-postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"  # 외부 포트를 5433으로 변경
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db:/tmp/sql
