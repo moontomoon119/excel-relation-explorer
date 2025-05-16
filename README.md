@@ -1,4 +1,4 @@
-# Excel Relation Explorer 실행 가이드 (문의 moontomoon119@gmail.com)
+# Excel Relation Explorer 실행 가이드
 
 필요한 환경(필요시 다운받아야 합니다):
 Git (git clone 명령어 사용)
@@ -28,3 +28,5 @@ cd excel-relation-explorer
 docker-compose up
 ```
 3. http://localhost:3000 접속
+
+(문의 moontomoon119@gmail.com)
